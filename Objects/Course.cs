@@ -5,29 +5,29 @@ using System.Data.SqlClient;
 
 namespace RegistrarNS.Objects
 {
-  public class Student
+  public class Course
   {
     private int _id;
     private string _name;
-    private DateTime _date;
+    private string _courseNumber;
 
-    public Student(string name, DateTime date, int id =0)
+    public Course(string name, string courseNumber, int id =0)
     {
       _id = id;
       _name = name;
-      _date = date;
+      _courseNumber = courseNumber;
     }
-    public override bool Equals(System.Object otherStudent)
+    public override bool Equals(System.Object otherCourse)
     {
-      if (!(otherStudent is Student))
+      if (!(otherCourse is Course))
       {
         return false;
       }
       else
       {
-        Student testStudent = (Student) otherStudent;
-        bool idEquality =this.GetId() == testStudent.GetId();
-        bool nameEquality = this.GetName() == testStudent.GetName();
+        Course testCourse = (Course) otherCourse;
+        bool idEquality =this.GetId() == testCourse.GetId();
+        bool nameEquality = this.GetName() == testCourse.GetName();
         return (idEquality && nameEquality);
       }
     }
@@ -47,33 +47,33 @@ namespace RegistrarNS.Objects
     {
       _name = name;
     }
-    public DateTime GetDate()
+    public string GetCourseNumber()
     {
-      return _date;
+      return _courseNumber;
     }
-    public void SetDate(DateTime date)
+    public void SetCourseNumber(string courseNumber)
     {
-      _date = date;
+      _courseNumber = courseNumber;
     }
 
-    public static List<Student> GetAll()
+    public static List<Course> GetAll()
     {
-      List<Student> allStudents = new List<Student>{};
+      List<Course> allCourses = new List<Course>{};
 
       SqlConnection conn = DB.Connection();
       SqlDataReader rdr = null;
       conn.Open();
 
-      SqlCommand cmd = new SqlCommand("SELECT * FROM students", conn);
+      SqlCommand cmd = new SqlCommand("SELECT * FROM courses", conn);
       rdr = cmd.ExecuteReader();
 
       while(rdr.Read())
       {
-        int studentId = rdr.GetInt32(0);
-        string studentName = rdr.GetString(1);
-        DateTime StudentDateTime = rdr.GetDateTime(2);
-        Student testStudent = new Student(studentName, StudentDateTime, studentId);
-        allStudents.Add(testStudent);
+        int courseId = rdr.GetInt32(0);
+        string courseName = rdr.GetString(1);
+        string courseNumber = rdr.GetString(2);
+        Course testCourse = new Course(courseName, courseNumber, courseId);
+        allCourses.Add(testCourse);
       }
       if (rdr != null)
       {
@@ -83,7 +83,7 @@ namespace RegistrarNS.Objects
       {
         conn.Close();
       }
-      return allStudents;
+      return allCourses;
     }
     public void Save()
     {
@@ -91,15 +91,15 @@ namespace RegistrarNS.Objects
       SqlDataReader rdr = null;
       conn.Open();
 
-      SqlCommand cmd = new SqlCommand("INSERT INTO students (name, date) OUTPUT INSERTED.id VALUES (@StudentName, @StudentDate)", conn);
+      SqlCommand cmd = new SqlCommand("INSERT INTO courses (name, courseNumber) OUTPUT INSERTED.id VALUES (@CourseName, @CourseNumber)", conn);
 
       SqlParameter nameParam = new SqlParameter();
-      nameParam.ParameterName = "@StudentName";
+      nameParam.ParameterName = "@CourseName";
       nameParam.Value = this.GetName();
 
       SqlParameter dateParam = new SqlParameter();
-      dateParam.ParameterName = "@StudentDate";
-      dateParam.Value = this.GetDate();
+      dateParam.ParameterName = "@CourseNumber";
+      dateParam.Value = this.GetCourseNumber();
 
       cmd.Parameters.Add(nameParam);
       cmd.Parameters.Add(dateParam);
@@ -120,35 +120,35 @@ namespace RegistrarNS.Objects
         conn.Close();
       }
     }
-    // Student student1 = Student.Find(1);
+    // Course course1 = Course.Find(1);
 
-    public static Student Find(int id)
+    public static Course Find(int id)
     {
       SqlConnection conn = DB.Connection();
       SqlDataReader rdr = null;
       conn.Open();
 
-      SqlCommand cmd = new SqlCommand("SELECT * FROM students WHERE id = @StudentId", conn);
+      SqlCommand cmd = new SqlCommand("SELECT * FROM courses WHERE id = @CourseId", conn);
 
       SqlParameter idParam = new SqlParameter();
-      idParam.ParameterName = "@StudentId";
+      idParam.ParameterName = "@CourseId";
       idParam.Value = id;
 
       cmd.Parameters.Add(idParam);
 
       rdr = cmd.ExecuteReader();
 
-      int foundStudentId = 0;
-      string foundStudentName = null;
-      DateTime foundStudentdate = new DateTime(2000,1,1);
+      int foundCourseId = 0;
+      string foundCourseName = null;
+      string foundCourseNumber = null;
 
       while(rdr.Read())
       {
-        foundStudentId = rdr.GetInt32(0);
-        foundStudentName = rdr.GetString(1);
-        foundStudentdate = rdr.GetDateTime(2);
+        foundCourseId = rdr.GetInt32(0);
+        foundCourseName = rdr.GetString(1);
+        foundCourseNumber = rdr.GetString(2);
       }
-      Student foundStudent = new Student(foundStudentName, foundStudentdate, foundStudentId);
+      Course foundCourse = new Course(foundCourseName, foundCourseNumber, foundCourseId);
 
       if (rdr != null)
       {
@@ -158,7 +158,7 @@ namespace RegistrarNS.Objects
       {
         conn.Close();
       }
-      return foundStudent;
+      return foundCourse;
     }
     public void Delete()
     {
@@ -166,10 +166,10 @@ namespace RegistrarNS.Objects
       SqlDataReader rdr = null;
       conn.Open();
 
-      SqlCommand cmd = new SqlCommand("Delete From students WHERE id = @StudentId", conn);
+      SqlCommand cmd = new SqlCommand("Delete From courses WHERE id = @CourseId", conn);
 
       SqlParameter idParam = new SqlParameter();
-      idParam.ParameterName = "@StudentId";
+      idParam.ParameterName = "@CourseId";
       idParam.Value = this.GetId();
 
       cmd.Parameters.Add(idParam);
@@ -191,7 +191,7 @@ namespace RegistrarNS.Objects
       SqlDataReader rdr = null;
       conn.Open();
 
-      SqlCommand cmd = new SqlCommand("Delete FROM students", conn);
+      SqlCommand cmd = new SqlCommand("Delete FROM courses", conn);
 
       rdr = cmd.ExecuteReader();
 

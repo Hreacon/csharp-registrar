@@ -46,6 +46,59 @@ namespace RegistrarNS
       Assert.Equal(test, Student.Find(test.GetId()));
     }
 
+    [Fact]
+    public void Student_DeleteById()
+    {
+      Student test = new Student("matt", new DateTime(1991,8,8));
+      test.Save();
+      test.Delete();
+      Assert.Equal(0, Student.GetAll().Count);
+    }
+    [Fact]
+    public void Course_CourseHoldsOwnName()
+    {
+      Course testCourse = new Course("Basic History Lesson 5", "HIST100");
+      Assert.Equal("Basic History Lesson 5", testCourse.GetName());
+    }
+
+    [Fact]
+    public void Equals_Override_Course()
+    {
+      Course testCourse = new Course("Basic History Lesson 5", "HIST100");
+      Course testCourse2 = new Course("Basic History Lesson 5", "HIST100");
+      Assert.Equal(testCourse2, testCourse);
+    }
+
+    [Fact]
+    public void Course_GetAll()
+    {
+      Assert.Equal(0, Course.GetAll().Count);
+    }
+
+    [Fact]
+    public void Course_Saves()
+    {
+      Course testCourse = new Course("Basic History Lesson 5", "HIST100");
+      testCourse.Save();
+      Assert.Equal(1, Course.GetAll().Count);
+    }
+
+    [Fact]
+    public void Course_FindsById()
+    {
+      Course test = new Course("Basic History Lesson 5", "HIST100");
+      test.Save();
+      Assert.Equal(test, Course.Find(test.GetId()));
+    }
+
+    [Fact]
+    public void Course_DeleteById()
+    {
+      Course test = new Course("Basic History Lesson 5", "HIST100");
+      test.Save();
+      test.Delete();
+      Assert.Equal(0, Course.GetAll().Count);
+    }
      public StudentTest()
      {
        DBConfiguration.ConnectionString = "Data Source=(localdb)\\mssqllocaldb;Initial Catalog=harvard_test;Integrated Security=SSPI;";
@@ -53,6 +106,7 @@ namespace RegistrarNS
      public void Dispose()
      {
        Student.DeleteAll();
+       Course.DeleteAll();
      }
   }
 }
