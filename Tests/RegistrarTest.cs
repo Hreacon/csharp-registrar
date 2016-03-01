@@ -97,7 +97,17 @@ namespace RegistrarNS
       Course test = new Course("Basic History Lesson 5", "HIST100");
       test.Save();
       test.Delete();
-      Assert.Equal(0, Course.GetAll().Count);
+      Assert.Equal(0, Course.GetAll().Count); // get all the courses using Course.Method, a static method call
+    }
+    [Fact]
+    public void GetStudents_FromCourseById()
+    {
+      Course history = new Course("Basic History", "HIST100");
+      history.Save();
+      Student matt = new Student("matt", new DateTime(2016,1,4));
+      matt.Save();
+      history.AddStudent(matt.GetId());   // // matt is taking history, add matt to the specific history class (non static reference)
+      Assert.Equal(matt, history.GetStudents()[0]);
     }
      public StudentTest()
      {

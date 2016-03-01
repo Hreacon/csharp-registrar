@@ -85,6 +85,75 @@ namespace RegistrarNS.Objects
       }
       return allCourses;
     }
+    public List<Student> GetStudents()
+    {
+      List<Student> allStudents = new List<Student>{};
+
+      SqlConnection conn = DB.Connection();
+      SqlDataReader rdr = null;
+      conn.Open();
+
+      SqlCommand cmd = new SqlCommand("SELECT students.* FROM courses JOIN class ON (courses.id = class.course_id) JOIN students ON (class.student_id = students.id) WHERE courses.id = @parameterId", conn);
+
+      SqlParameter idParam = new SqlParameter();
+      idParam.ParameterName = "@parameterId";
+      idParam.Value = this.GetId();
+
+      cmd.Parameters.Add(idParam);
+
+      rdr = cmd.ExecuteReader();
+      while(rdr.Read())
+      {
+        // get the student data from the database
+        int studentId = rdr.GetInt32(0);
+        string studentName = rdr.GetString(1);
+        DateTime date = rdr.GetDateTime(2);
+         // make the student object`
+         Student testStudent = new Student(studentName, date, studentId);
+         // add the student object to the list
+         allStudents.Add(testStudent);
+      }
+      if (rdr != null)
+      {
+        rdr.Close();
+      }
+      if (conn != null)
+      {
+        conn.Close();
+      }
+      return allStudents;
+    }
+    public void AddStudent(int studentId)
+    {
+      SqlConnection conn = DB.Connection();
+      SqlDataReader rdr = null;
+      conn.Open();
+
+      SqlCommand cmd = new SqlCommand("INSERT INTO class (student_id, course_id) OUTPUT INSERTED.id VALUES (@StudentId, @CourseId)",conn);
+
+      SqlParameter studentIdParam = new SqlParameter();
+      studentIdParam.ParameterName = "@StudentId";
+      studentIdParam.Value = studentId;
+
+      SqlParameter CourseIdParam = new SqlParameter();
+      CourseIdParam.ParameterName = "@CourseId";
+      CourseIdParam.Value = this.GetId();
+
+      cmd.Parameters.Add(studentIdParam);
+      cmd.Parameters.Add(CourseIdParam);
+
+      rdr = cmd.ExecuteReader();
+
+      if (rdr != null)
+      {
+        rdr.Close();
+      }
+      if (conn != null)
+      {
+        conn.Close();
+      }
+
+    }
     public void Save()
     {
       SqlConnection conn = DB.Connection();
