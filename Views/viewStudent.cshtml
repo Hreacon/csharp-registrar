@@ -1,0 +1,22 @@
+@Html.Partial("header.cshtml")
+
+<h1>Current Courses</h1>
+<ul>
+  @foreach(var course in Model.GetCourses())
+  {
+    <li>@course.GetName()</li>
+  }
+</ul>
+
+<h2>Course Not Enrolled</h2>
+<p>
+  Click to enroll
+</p>
+
+<ul>
+  @foreach(var course in Model.GetCoursesNotInStudent())
+  {
+    <li><a href="/student/@Model.GetId()/add/@course.GetId()">@course.GetName()</a></li>
+  }
+</ul>
+<a href="/" class="link">Go Home</a>

@@ -85,6 +85,101 @@ namespace RegistrarNS.Objects
       }
       return allStudents;
     }
+    public List<Course> GetCoursesNotInStudent()
+    {
+      List<Course> allCourses = new List<Course>{};
+
+      SqlConnection conn = DB.Connection();
+      SqlDataReader rdr = null;
+      conn.Open();
+
+      SqlCommand cmd = new SqlCommand("SELECT courses.* FROM courses JOIN class ON (courses.id = class.course_id) JOIN students ON (class.student_id = students.id) WHERE students.id = @parameterId", conn);
+
+      SqlParameter idParam = new SqlParameter();
+      idParam.ParameterName = "@parameterId";
+      idParam.Value = this.GetId();
+
+      cmd.Parameters.Add(idParam);
+
+      rdr = cmd.ExecuteReader();
+      while(rdr.Read())
+      {
+        // get the student data from the database
+        int courseId = rdr.GetInt32(0);
+        string courseName = rdr.GetString(1);
+        string courseNumber = rdr.GetString(2);
+         // make the course object`
+         Course newCourse = new Course(courseName, courseNumber, courseId);
+         // add the student object to the list
+         allCourses.Add(newCourse);
+      }
+      rdr.Close();
+      cmd = new SqlCommand("SELECT * FROM courses", conn);
+
+      rdr = cmd.ExecuteReader();
+      List<Course> output = new List<Course>(){};
+      while(rdr.Read())
+      {
+        // foreach student the reader is bringing in loop through students in the course
+        int id = rdr.GetInt32(0);
+        bool found = false;
+        foreach(Course s in allCourses)
+        {
+          if( s.GetId() == id )
+            found = true;
+        }
+        if(!found)
+          output.Add(new Course(rdr.GetString(1), rdr.GetString(2), id));
+      }
+
+      if (rdr != null)
+      {
+        rdr.Close();
+      }
+      if (conn != null)
+      {
+        conn.Close();
+      }
+      return output;
+    }
+    public List<Course> GetCourses()
+    {
+      List<Course> allCourses = new List<Course>{};
+
+      SqlConnection conn = DB.Connection();
+      SqlDataReader rdr = null;
+      conn.Open();
+
+      SqlCommand cmd = new SqlCommand("SELECT courses.* FROM courses JOIN class ON (courses.id = class.course_id) JOIN students ON (class.student_id = students.id) WHERE students.id = @parameterId", conn);
+
+      SqlParameter idParam = new SqlParameter();
+      idParam.ParameterName = "@parameterId";
+      idParam.Value = this.GetId();
+
+      cmd.Parameters.Add(idParam);
+
+      rdr = cmd.ExecuteReader();
+      while(rdr.Read())
+      {
+        // get the student data from the database
+        int courseId = rdr.GetInt32(0);
+        string courseName = rdr.GetString(1);
+        string courseNumber = rdr.GetString(2);
+         // make the student object`
+         Course testCourse = new Course(courseName, courseNumber, courseId);
+         // add the student object to the list
+         allCourses.Add(testCourse);
+      }
+      if (rdr != null)
+      {
+        rdr.Close();
+      }
+      if (conn != null)
+      {
+        conn.Close();
+      }
+      return allCourses;
+    }
     public void Save()
     {
       SqlConnection conn = DB.Connection();

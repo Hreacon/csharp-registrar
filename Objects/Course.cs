@@ -123,6 +123,63 @@ namespace RegistrarNS.Objects
       }
       return allStudents;
     }
+    public List<Student> GetStudentsNotInCourse()
+    {
+      List<Student> allStudents = new List<Student>{};
+
+      SqlConnection conn = DB.Connection();
+      SqlDataReader rdr = null;
+      conn.Open();
+
+      SqlCommand cmd = new SqlCommand("SELECT students.* FROM courses JOIN class ON (courses.id = class.course_id) JOIN students ON (class.student_id = students.id) WHERE courses.id = @parameterId", conn);
+
+      SqlParameter idParam = new SqlParameter();
+      idParam.ParameterName = "@parameterId";
+      idParam.Value = this.GetId();
+
+      cmd.Parameters.Add(idParam);
+
+      rdr = cmd.ExecuteReader();
+      while(rdr.Read())
+      {
+        // get the student data from the database
+        int studentId = rdr.GetInt32(0);
+        string studentName = rdr.GetString(1);
+        DateTime date = rdr.GetDateTime(2);
+         // make the student object`
+         Student testStudent = new Student(studentName, date, studentId);
+         // add the student object to the list
+         allStudents.Add(testStudent);
+      }
+      rdr.Close();
+      cmd = new SqlCommand("SELECT * FROM students", conn);
+
+      rdr = cmd.ExecuteReader();
+      List<Student> output = new List<Student>(){};
+      while(rdr.Read())
+      {
+        // foreach student the reader is bringing in loop through students in the course
+        int id = rdr.GetInt32(0);
+        bool found = false;
+        foreach(Student s in allStudents)
+        {
+          if( s.GetId() == id )
+            found = true;
+        }
+        if(!found)
+          output.Add(new Student(rdr.GetString(1), rdr.GetDateTime(2), id));
+      }
+
+      if (rdr != null)
+      {
+        rdr.Close();
+      }
+      if (conn != null)
+      {
+        conn.Close();
+      }
+      return output;
+    }
     public void AddStudent(int studentId)
     {
       SqlConnection conn = DB.Connection();

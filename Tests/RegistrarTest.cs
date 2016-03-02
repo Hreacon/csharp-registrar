@@ -109,6 +109,15 @@ namespace RegistrarNS
       history.AddStudent(matt.GetId());   // // matt is taking history, add matt to the specific history class (non static reference)
       Assert.Equal(matt, history.GetStudents()[0]);
     }
+    public void GetAllTheCoursesTheStudentsIsSignedUpFor()
+    {
+      Student matt = new Student("matt", new DateTime(2016,1,4));
+      matt.Save();
+      Course history = new Course("Basic History", "HIST100");
+      history.Save();
+      history.AddStudent(matt.GetId());
+      Assert.Equal(history, matt.GetCourses()[0]);
+    }
      public StudentTest()
      {
        DBConfiguration.ConnectionString = "Data Source=(localdb)\\mssqllocaldb;Initial Catalog=harvard_test;Integrated Security=SSPI;";
